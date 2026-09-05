@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Demo Student Card Generator</title>
+  <style>
+    body {font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f5f5f5;margin:0;padding:32px}
+    .box {max-width:640px;margin:auto;background:white;border-radius:18px;padding:26px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+    h1 {margin-top:0}
+    label {display:block;margin-top:15px;font-weight:600}
+    input {width:100%;box-sizing:border-box;padding:12px;margin-top:6px;border:1px solid #bbb;border-radius:10px}
+    button {width:100%;padding:14px;margin-top:22px;border:0;border-radius:10px;font-weight:700;cursor:pointer}
+    .note {font-size:14px;color:#555;line-height:1.5;margin-top:16px}
+  </style>
+</head>
+<body>
+<div class="box">
+  <h1>Demo Student Card Generator</h1>
+  <form action="/generate" method="post" enctype="multipart/form-data">
+    <label>Tên hiển thị</label>
+    <input name="name" maxlength="40" placeholder="DEMO USER">
+
+    <label>Tên trường mẫu</label>
+    <input name="school" maxlength="50" placeholder="DEMO UNIVERSITY">
+
+    <label>Mã demo</label>
+    <input name="student_id" maxlength="30" placeholder="DEMO-000001">
+
+    <label>Ảnh chân dung</label>
+    <input type="file" name="photo" accept="image/png,image/jpeg,image/webp">
+
+    <button type="submit">Tạo thẻ demo PNG</button>
+  </form>
+  <div class="note">
+    Mọi ảnh xuất ra đều có watermark <b>SAMPLE / NOT VALID</b> và chỉ dùng cho mockup, thử giao diện hoặc demo.
+  </div>
+</div>
+</body>
+</html>
