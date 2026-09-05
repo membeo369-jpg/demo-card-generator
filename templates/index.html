@@ -2,39 +2,620 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Demo Student Card Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo Card Studio</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
   <style>
-    body {font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f5f5f5;margin:0;padding:32px}
-    .box {max-width:640px;margin:auto;background:white;border-radius:18px;padding:26px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    h1 {margin-top:0}
-    label {display:block;margin-top:15px;font-weight:600}
-    input {width:100%;box-sizing:border-box;padding:12px;margin-top:6px;border:1px solid #bbb;border-radius:10px}
-    button {width:100%;padding:14px;margin-top:22px;border:0;border-radius:10px;font-weight:700;cursor:pointer}
-    .note {font-size:14px;color:#555;line-height:1.5;margin-top:16px}
+    :root {
+      --bg: #09111f;
+      --panel: rgba(15, 25, 44, 0.92);
+      --panel-2: rgba(21, 34, 58, 0.95);
+      --line: rgba(255,255,255,.10);
+      --text: #f7f9fc;
+      --muted: #9bacbf;
+      --input: #0d1728;
+      --accent: #88aaff;
+      --accent2: #a98cff;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(79,124,255,.20), transparent 32%),
+        radial-gradient(circle at 100% 10%, rgba(146,89,255,.18), transparent 28%),
+        linear-gradient(145deg, #07101c, #0b1423 45%, #09111e);
+      color: var(--text);
+    }
+
+    body { padding: 32px; }
+
+    .app {
+      max-width: 1250px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.30);
+      backdrop-filter: blur(18px);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      letter-spacing: -.03em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .field { margin-bottom: 15px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #becadd;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #2b3b55;
+      border-radius: 12px;
+      outline: none;
+      background: var(--input);
+      color: white;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(136,170,255,.12);
+    }
+
+    input[type=file] {
+      padding: 10px;
+      color: #c7d3e4;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 13px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 850;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 12px 28px rgba(115,127,255,.24);
+      transition: transform .15s ease, filter .15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    button.secondary {
+      margin-top: 10px;
+      color: #dce5f3;
+      background: #17243a;
+      box-shadow: none;
+      border: 1px solid #2b3b55;
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #8392a9;
+    }
+
+    .stage {
+      min-height: 690px;
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 42px;
+      overflow: auto;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(103,153,255,.12), transparent 33%),
+        linear-gradient(145deg, rgba(14,24,42,.96), rgba(12,19,33,.96));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    /* CARD */
+    .card-shell {
+      width: 900px;
+      min-width: 900px;
+      height: 560px;
+      position: relative;
+      border-radius: 34px;
+      overflow: hidden;
+      color: white;
+      background:
+        radial-gradient(circle at 92% 6%, rgba(255,255,255,.16), transparent 28%),
+        radial-gradient(circle at 88% 100%, rgba(113,157,255,.24), transparent 35%),
+        linear-gradient(135deg, #111e39 0%, #1f365f 54%, #355f9c 100%);
+      box-shadow: 0 35px 80px rgba(0,0,0,.42);
+      isolation: isolate;
+    }
+
+    .card-shell.theme-violet {
+      background:
+        radial-gradient(circle at 90% 5%, rgba(255,255,255,.14), transparent 26%),
+        linear-gradient(135deg,#17142d,#32285d 55%,#6650a6);
+    }
+
+    .card-shell.theme-slate {
+      background:
+        radial-gradient(circle at 92% 8%, rgba(255,255,255,.14), transparent 25%),
+        linear-gradient(135deg,#111822,#263445 60%,#44576b);
+    }
+
+    .orb {
+      position: absolute;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+    .orb.o1 { width: 230px; height: 230px; right: -55px; top: -70px; }
+    .orb.o2 { width: 170px; height: 170px; right: 30px; top: -30px; }
+    .orb.o3 { width: 115px; height: 115px; right: 98px; top: 18px; }
+
+    .topbar {
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 3;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      max-width: 660px;
+    }
+
+    .logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      background: rgba(255,255,255,.96);
+      color: #18274a;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 950;
+      box-shadow: 0 10px 24px rgba(0,0,0,.14);
+    }
+
+    .school {
+      font-size: 27px;
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-type {
+      font-size: 12px;
+      letter-spacing: .16em;
+      margin-top: 7px;
+      color: rgba(235,242,255,.72);
+      font-weight: 750;
+    }
+
+    .demo-badge {
+      padding: 11px 17px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      font-size: 13px;
+      letter-spacing: .14em;
+      font-weight: 900;
+    }
+
+    .content {
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 132px;
+      bottom: 56px;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 32px;
+      z-index: 3;
+    }
+
+    .photo-wrap {
+      background: rgba(255,255,255,.96);
+      border-radius: 27px;
+      padding: 6px;
+      box-shadow: 0 20px 38px rgba(0,0,0,.20);
+      height: 326px;
+      align-self: center;
+    }
+
+    .photo {
+      width: 100%;
+      height: 100%;
+      border-radius: 22px;
+      object-fit: cover;
+      display: block;
+      background: #d9e0ea;
+    }
+
+    .info {
+      align-self: center;
+      min-height: 326px;
+      border-radius: 27px;
+      padding: 29px 32px;
+      background: rgba(255,255,255,.94);
+      color: #172238;
+      box-shadow: 0 20px 38px rgba(0,0,0,.16);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: min-content;
+      gap: 22px 30px;
+    }
+
+    .info .wide { grid-column: 1 / -1; }
+
+    .k {
+      font-size: 10px;
+      font-weight: 900;
+      color: #8390a5;
+      letter-spacing: .14em;
+      margin-bottom: 7px;
+    }
+
+    .v {
+      font-size: 22px;
+      font-weight: 760;
+      line-height: 1.18;
+      word-break: break-word;
+    }
+
+    .v.name {
+      font-size: 31px;
+      font-weight: 950;
+      letter-spacing: -.025em;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #eaf0fc;
+      color: #355b9c;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6d88bd;
+    }
+
+    .footer {
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      bottom: 22px;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .10em;
+      color: rgba(235,242,255,.75);
+    }
+
+    .watermark {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      transform: translate(-50%, -50%) rotate(-14deg);
+      z-index: 10;
+      font-size: 62px;
+      font-weight: 1000;
+      letter-spacing: .05em;
+      white-space: nowrap;
+      color: rgba(255,255,255,.16);
+      border: 5px solid rgba(255,255,255,.13);
+      border-radius: 19px;
+      padding: 7px 20px;
+      pointer-events: none;
+      text-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+
+    .safe-strip {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 7px;
+      background: rgba(255,255,255,.28);
+      z-index: 4;
+    }
+
+    @media (max-width: 1050px) {
+      .app { grid-template-columns: 1fr; }
+      .stage { justify-content: flex-start; }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 14px; }
+      .panel { padding: 18px; border-radius: 18px; }
+      .stage { padding: 20px; min-height: 620px; }
+      .row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
+
 <body>
-<div class="box">
-  <h1>Demo Student Card Generator</h1>
-  <form action="/generate" method="post" enctype="multipart/form-data">
-    <label>Tên hiển thị</label>
-    <input name="name" maxlength="40" placeholder="DEMO USER">
+<div class="app">
 
-    <label>Tên trường mẫu</label>
-    <input name="school" maxlength="50" placeholder="DEMO UNIVERSITY">
+  <section class="panel">
+    <h1>Demo Card Studio</h1>
+    <div class="subtitle">
+      Preview trực tiếp và xuất PNG. Mẫu này được thiết kế cho mockup/demo và luôn có dấu
+      <b>SAMPLE / NOT VALID</b>.
+    </div>
 
-    <label>Mã demo</label>
-    <input name="student_id" maxlength="30" placeholder="DEMO-000001">
+    <div class="field">
+      <label>Tên trường / tổ chức demo</label>
+      <input id="schoolInput" value="NORTHSTAR UNIVERSITY" maxlength="45">
+    </div>
 
-    <label>Ảnh chân dung</label>
-    <input type="file" name="photo" accept="image/png,image/jpeg,image/webp">
+    <div class="field">
+      <label>Tên hiển thị</label>
+      <input id="nameInput" value="ALEX MORGAN" maxlength="36">
+    </div>
 
-    <button type="submit">Tạo thẻ demo PNG</button>
-  </form>
-  <div class="note">
-    Mọi ảnh xuất ra đều có watermark <b>SAMPLE / NOT VALID</b> và chỉ dùng cho mockup, thử giao diện hoặc demo.
-  </div>
+    <div class="row">
+      <div class="field">
+        <label>Chương trình</label>
+        <input id="programInput" value="Computer Science" maxlength="30">
+      </div>
+
+      <div class="field">
+        <label>Demo ID</label>
+        <input id="idInput" value="DEMO-2026-001" maxlength="24">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Năm học</label>
+        <input id="yearInput" value="2026–2027" maxlength="18">
+      </div>
+
+      <div class="field">
+        <label>Theme</label>
+        <select id="themeInput">
+          <option value="">Blue</option>
+          <option value="theme-violet">Violet</option>
+          <option value="theme-slate">Slate</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Ảnh chân dung</label>
+      <input id="photoInput" type="file" accept="image/png,image/jpeg,image/webp">
+    </div>
+
+    <button id="downloadBtn">Tải PNG</button>
+    <button class="secondary" id="resetBtn" type="button">Đặt lại</button>
+
+    <div class="note">
+      Watermark và dòng “FICTIONAL DEMO CARD • NOT A REAL CREDENTIAL” được gắn cố định vào mẫu.
+    </div>
+  </section>
+
+  <section class="stage">
+    <div id="captureCard" class="card-shell">
+
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo" id="logoLetter">N</div>
+          <div>
+            <div class="school" id="schoolText">NORTHSTAR UNIVERSITY</div>
+            <div class="card-type">STUDENT ACCESS CARD • DEMO</div>
+          </div>
+        </div>
+
+        <div class="demo-badge">DEMO</div>
+      </div>
+
+      <div class="content">
+        <div class="photo-wrap">
+          <img
+            id="photoPreview"
+            class="photo"
+            alt="Portrait preview"
+            src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='650' viewBox='0 0 500 650'%3E%3Crect width='500' height='650' fill='%23d9e0ea'/%3E%3Ccircle cx='250' cy='210' r='105' fill='%23aab5c5'/%3E%3Cpath d='M90 610c10-165 83-248 160-248s150 83 160 248' fill='%23aab5c5'/%3E%3C/svg%3E">
+        </div>
+
+        <div class="info">
+          <div class="wide">
+            <div class="k">NAME</div>
+            <div class="v name" id="nameText">ALEX MORGAN</div>
+          </div>
+
+          <div class="wide">
+            <div class="k">PROGRAM</div>
+            <div class="v" id="programText">Computer Science</div>
+          </div>
+
+          <div>
+            <div class="k">DEMO ID</div>
+            <div class="v" id="idText">DEMO-2026-001</div>
+          </div>
+
+          <div>
+            <div class="k">ACADEMIC YEAR</div>
+            <div class="v" id="yearText">2026–2027</div>
+          </div>
+
+          <div class="wide">
+            <div class="status">
+              <span class="status-dot"></span>
+              SAMPLE DOCUMENT
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="watermark">SAMPLE • NOT VALID</div>
+
+      <div class="footer">
+        <span>FICTIONAL DEMO CARD • NOT A REAL CREDENTIAL</span>
+        <span>UI MOCKUP</span>
+      </div>
+
+      <div class="safe-strip"></div>
+    </div>
+  </section>
+
 </div>
+
+<script>
+  const schoolInput = document.getElementById('schoolInput');
+  const nameInput = document.getElementById('nameInput');
+  const programInput = document.getElementById('programInput');
+  const idInput = document.getElementById('idInput');
+  const yearInput = document.getElementById('yearInput');
+  const themeInput = document.getElementById('themeInput');
+  const photoInput = document.getElementById('photoInput');
+
+  const card = document.getElementById('captureCard');
+  const schoolText = document.getElementById('schoolText');
+  const nameText = document.getElementById('nameText');
+  const programText = document.getElementById('programText');
+  const idText = document.getElementById('idText');
+  const yearText = document.getElementById('yearText');
+  const logoLetter = document.getElementById('logoLetter');
+  const photoPreview = document.getElementById('photoPreview');
+
+  function clean(value, fallback) {
+    const v = value.trim();
+    return v || fallback;
+  }
+
+  function updatePreview() {
+    const school = clean(schoolInput.value, 'NORTHSTAR UNIVERSITY');
+    schoolText.textContent = school.toUpperCase();
+    nameText.textContent = clean(nameInput.value, 'ALEX MORGAN').toUpperCase();
+    programText.textContent = clean(programInput.value, 'Computer Science');
+    idText.textContent = clean(idInput.value, 'DEMO-2026-001');
+    yearText.textContent = clean(yearInput.value, '2026–2027');
+    logoLetter.textContent = school.charAt(0).toUpperCase() || 'N';
+
+    card.className = 'card-shell';
+    if (themeInput.value) card.classList.add(themeInput.value);
+  }
+
+  [schoolInput, nameInput, programInput, idInput, yearInput, themeInput]
+    .forEach(el => el.addEventListener('input', updatePreview));
+
+  photoInput.addEventListener('change', (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Hãy chọn file ảnh.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => photoPreview.src = e.target.result;
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('downloadBtn');
+    btn.disabled = true;
+    btn.textContent = 'Đang tạo PNG...';
+
+    try {
+      const canvas = await html2canvas(card, {
+        scale: 2,
+        backgroundColor: null,
+        useCORS: true,
+        logging: false
+      });
+
+      const link = document.createElement('a');
+      link.download = 'demo-card.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error(err);
+      alert('Không thể tạo PNG. Hãy thử tải lại trang.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Tải PNG';
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    schoolInput.value = 'NORTHSTAR UNIVERSITY';
+    nameInput.value = 'ALEX MORGAN';
+    programInput.value = 'Computer Science';
+    idInput.value = 'DEMO-2026-001';
+    yearInput.value = '2026–2027';
+    themeInput.value = '';
+    photoInput.value = '';
+    photoPreview.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='650' viewBox='0 0 500 650'%3E%3Crect width='500' height='650' fill='%23d9e0ea'/%3E%3Ccircle cx='250' cy='210' r='105' fill='%23aab5c5'/%3E%3Cpath d='M90 610c10-165 83-248 160-248s150 83 160 248' fill='%23aab5c5'/%3E%3C/svg%3E";
+    updatePreview();
+  });
+
+  updatePreview();
+</script>
 </body>
 </html>

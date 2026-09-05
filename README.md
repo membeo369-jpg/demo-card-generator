@@ -1,22 +1,41 @@
-# Demo Student Card Generator
+# Demo Card Studio v3
 
-Standalone web app for generating clearly marked demo/mock student cards.
+Standalone Flask web app for creating clearly marked fictional demo/mockup cards.
 
-## Local
-```bash
-pip install -r requirements.txt
-python app.py
-```
-
-Open http://localhost:8080
+## Features
+- Live HTML/CSS preview
+- Upload portrait image
+- Edit school/demo organization, name, program, demo ID, year
+- Multiple visual themes
+- Download card as PNG in the browser
+- Permanent visible `SAMPLE / NOT VALID` watermark
+- Railway-ready
 
 ## Railway
-1. Push this folder to GitHub.
-2. Railway -> New Project -> Deploy from GitHub.
-3. Railway will install `requirements.txt`.
-4. Start command:
-   `gunicorn app:app --bind 0.0.0.0:$PORT`
 
-No database or environment variables are required.
+Push these files to your GitHub repository.
 
-All generated cards contain a prominent `SAMPLE / NOT VALID` watermark.
+Start command:
+
+```bash
+gunicorn app:app --bind 0.0.0.0:$PORT
+```
+
+A `railway.json` file is included, so Railway can also detect the start command automatically.
+
+After deployment:
+1. Railway service -> Settings
+2. Networking / Public Networking
+3. Generate Domain
+4. Open the generated URL
+
+## Structure
+
+```text
+app.py
+requirements.txt
+Procfile
+railway.json
+templates/
+  index.html
+```
