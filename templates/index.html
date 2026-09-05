@@ -238,16 +238,6 @@
       font-weight: 750;
     }
 
-    .demo-badge {
-      padding: 11px 17px;
-      border-radius: 15px;
-      border: 1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.10);
-      font-size: 13px;
-      letter-spacing: .14em;
-      font-weight: 900;
-    }
-
     .content {
       position: absolute;
       left: 44px;
@@ -313,41 +303,6 @@
       font-size: 31px;
       font-weight: 950;
       letter-spacing: -.025em;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      border-radius: 999px;
-      padding: 8px 12px;
-      background: #eaf0fc;
-      color: #355b9c;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .08em;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #6d88bd;
-    }
-
-    .footer {
-      position: absolute;
-      left: 44px;
-      right: 44px;
-      bottom: 22px;
-      z-index: 3;
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .10em;
-      color: rgba(235,242,255,.75);
     }
 
     .watermark {
@@ -449,7 +404,7 @@
     <button class="secondary" id="resetBtn" type="button">Đặt lại</button>
 
     <div class="note">
-      Watermark và dòng “FICTIONAL DEMO CARD • NOT A REAL CREDENTIAL” được gắn cố định vào mẫu.
+      Mẫu chỉ giữ một watermark “SAMPLE • NOT VALID” để giao diện gọn hơn.
     </div>
   </section>
 
@@ -469,7 +424,7 @@
           </div>
         </div>
 
-        <div class="demo-badge">DEMO</div>
+        
       </div>
 
       <div class="content">
@@ -501,22 +456,10 @@
             <div class="k">ACADEMIC YEAR</div>
             <div class="v" id="yearText">2026–2027</div>
           </div>
-
-          <div class="wide">
-            <div class="status">
-              <span class="status-dot"></span>
-              SAMPLE DOCUMENT
-            </div>
-          </div>
         </div>
       </div>
 
       <div class="watermark">SAMPLE • NOT VALID</div>
-
-      <div class="footer">
-        <span>FICTIONAL DEMO CARD • NOT A REAL CREDENTIAL</span>
-        <span>UI MOCKUP</span>
-      </div>
 
       <div class="safe-strip"></div>
     </div>
